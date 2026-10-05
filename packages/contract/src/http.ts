@@ -3,7 +3,7 @@ import { AnswerId, DocId, MemoryId, SpaceId, ThreadId } from './ids.js';
 import { Depth, DoneEvent, Source } from './sse.js';
 
 /**
- * Every route in PRD 7, as request and response schemas. The gateway validates inbound
+ * Every route, as request and response schemas. The gateway validates inbound
  * bodies with these; the agent service validates what it sends back; the UI compiles
  * against the inferred types. One definition, three consumers, no drift.
  *
@@ -17,7 +17,7 @@ export const REQUEST_HEADER = 'x-request-id';
 export const ErrorBody = z.object({
   error: z.string().min(1),
   status: z.number().int().optional(),
-  /** 429 from the image cap says when the cap resets. */
+  /** A 429 from the deep-search daily cap or the rate limit says when it resets. */
   resetsAt: z.string().datetime().optional(),
   requestId: z.string().optional()
 });
@@ -128,14 +128,13 @@ export const ACCEPTED_UPLOAD_TYPES = [
 // ---------------------------------------------------------------- health & stats
 
 /**
- * `/health` must NAME what is live, not be restricted to one stack. A grader reading a
- * recall number has to know whether it came from an approximate vector index or an exact
- * scan, and whether search came from Tavily or SerpApi — so these are free strings with
+ * `/health` NAMES what is live rather than assuming one stack. Anyone reading a recall
+ * number has to know whether it came from an approximate vector index or an exact scan,
+ * and whether search came from Tavily or SerpApi, so these are free strings with
  * documented conventional values rather than closed enums.
  *
- * MERN is the taught path (`atlas-vector-search`, or `mongo-cosine-scan` for the local-dev
- * fallback). If you build on something else, say so here: `qdrant`, `pgvector`,
- * `pinecone`. What is graded is the contract and the gates, and both speak HTTP.
+ * The default deployment reports `atlas-vector-search`, or `mongo-cosine-scan` for the
+ * local-dev fallback; another backend would name itself (`qdrant`, `pgvector`, …).
  */
 export const HealthResponse = z.object({
   status: z.enum(['ok', 'degraded']),
@@ -144,7 +143,7 @@ export const HealthResponse = z.object({
   /** Conventionally "tavily" or "serpapi". Name whatever is live. */
   searchProvider: z.string().min(1),
   /**
-   * Conventionally "atlas-vector-search" or "mongo-cosine-scan" on the taught path.
+   * Conventionally "atlas-vector-search", or "mongo-cosine-scan" for local development.
    * Name whatever is live; a recall number is not comparable without it.
    */
   vectorStore: z.string().min(1),
@@ -154,7 +153,7 @@ export const HealthResponse = z.object({
   version: z.string().optional()
 });
 
-/** The values the taught MERN path reports, for reference and for the local-dev fallback. */
+/** The values the default MongoDB deployment reports, including the local-dev fallback. */
 export const VECTOR_BACKENDS = ['atlas-vector-search', 'mongo-cosine-scan'] as const;
 export const SEARCH_PROVIDERS = ['tavily', 'serpapi'] as const;
 export type HealthResponse = z.infer<typeof HealthResponse>;
@@ -174,13 +173,12 @@ export type StatsResponse = z.infer<typeof StatsResponse>;
 // ---------------------------------------------------------------- route table
 
 /**
- * The routes the UI calls, in one place, so a skeleton can register all of them as 501
- * and the bench can walk them. `auth: false` means no X-User-Id required.
+ * The routes the UI calls, in one place, so the services and the benchmark can walk them.
+ * `auth: false` means no X-User-Id required.
  */
 export const ROUTES = [
   { method: 'GET', path: '/health', auth: false },
   { method: 'GET', path: '/stats', auth: true },
-  { method: 'GET', path: '/evals/report.json', auth: false },
   { method: 'POST', path: '/threads', auth: true },
   { method: 'GET', path: '/threads', auth: true },
   { method: 'GET', path: '/threads/:threadId', auth: true },

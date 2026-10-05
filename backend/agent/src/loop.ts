@@ -10,7 +10,7 @@ import {
   type RunLog,
   type Source,
   type Terminated
-} from '@lumina/contract';
+} from '@cited/contract';
 import { env } from './env.js';
 import { anthropic, DETERMINISTIC, llmCostUsd, MODEL, SEARCH_USD_PER_CALL } from './llm.js';
 import { webSearch } from './search.js';
@@ -111,8 +111,8 @@ const ANSWER_RESERVE_SEC = 20;
 
 /**
  * The quick gear's economy. A quick answer is one search, two or three pages and a short
- * answer: Scenario E in SPEC.md ("one search, one fetch, one sentence, $0.004"). Anything
- * that needs more research than this is what the deep gear is for.
+ * answer: "what port does mongod listen on?" deserves one search, one page and one
+ * sentence, not a research project. Anything that needs more is what the deep gear is for.
  */
 /** Web searches per quick answer, enforced: the tool is withdrawn once they are spent. */
 const QUICK_MAX_SEARCHES = 2;

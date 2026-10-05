@@ -1,5 +1,5 @@
 {
-  "_comment": "Every index LUMINA needs, in one place. `node scripts/create-indexes.mjs` applies it and is safe to re-run. A free Atlas M0 cluster allows exactly 3 search indexes, and LUMINA needs exactly 3.",
+  "_comment": "Every index the service needs, in one place. `node scripts/create-indexes.mjs` applies it and is safe to re-run. A free Atlas M0 cluster allows exactly 3 search indexes, and this service needs exactly 3 (memory vectors, chunk vectors, chunk text).",
   "embeddingDims": 1536,
   "collections": {
     "threads": {

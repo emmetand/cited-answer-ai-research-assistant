@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { AskMode, Depth, DoneEvent, PlanEvent, Source, TraceEvent } from '@lumina/contract';
+import type { AskMode, Depth, DoneEvent, PlanEvent, Source, TraceEvent } from '@cited/contract';
 import { api, ApiError, askStream, setUserId, userId } from './api';
 import { Composer } from './components/Composer';
 import { AnswerText } from './components/AnswerText';
@@ -23,7 +23,7 @@ type UiMessage = {
   streaming?: boolean;
 };
 
-export function App({ route }: { route: 'app' | 'evals' }) {
+export function App() {
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [threads, setThreads] = useState<{ threadId: string; title: string }[]>([]);
   const [threadId, setThreadId] = useState<string | undefined>();
@@ -168,19 +168,16 @@ export function App({ route }: { route: 'app' | 'evals' }) {
       ? { used: stats.deepToday ?? 0, cap: stats.deepDailyCap }
       : undefined;
 
-  if (route === 'evals') return null;
-
   return (
     <>
       <header className="topbar">
         <div className="brand">
-          LUM<span>INA</span>
+          Cit<span>ed</span>
         </div>
         <nav>
           <a href="/" className="on">
             Ask
           </a>
-          <a href="/evals">Evals</a>
         </nav>
         <span className="spacer" />
         <div className="userbox">
@@ -251,7 +248,7 @@ export function App({ route }: { route: 'app' | 'evals' }) {
               ) : (
                 <div key={i} className="msg">
                   <header>
-                    lumina
+                    cited
                     {m.depth === 'deep' || m.done?.depth === 'deep' ? <span className="pill deep">deep</span> : null}
                     {m.done ? <span className={`pill ${m.done.terminated}`}>{m.done.terminated}</span> : null}
                   </header>

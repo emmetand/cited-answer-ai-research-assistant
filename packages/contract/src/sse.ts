@@ -8,7 +8,7 @@ import { AnswerId, DocId } from './ids.js';
  *   deep:   plan → trace* → sources → token* → done
  *
  * `sources` MUST arrive before the first `token` so the UI can render citation chips
- * while the text is still arriving (PRD 7). On a deep search `plan` comes first, so the
+ * while the text is still arriving. On a deep search `plan` comes first, so the
  * reader can see what the system decided to go and find out.
  *
  * `error` ends the stream at any point.
@@ -24,7 +24,7 @@ export const AskTool = z.enum([
   /**
    * Decomposes a question into sub-questions. DEEP SEARCH ONLY: a quick search that calls
    * this has silently escalated itself into a run that costs several times as much, which
-   * is the spend failure this separation exists to prevent (rule R2's shape).
+   * is the spend failure this separation exists to prevent.
    */
   'plan_research'
 ]);
@@ -61,13 +61,13 @@ export const TraceEvent = z
     subQuestion: z.number().int().positive().optional()
   })
   .superRefine((ev, ctx) => {
-    // Rule A1, enforced by the contract itself: a failure you cannot tell apart from an
-    // empty result is the Live Translate bug waiting to happen.
+    // Enforced by the contract itself: a failure you cannot tell apart from an empty
+    // result is how a broken dependency hides behind plausible-looking output.
     if (ev.ok === false && !ev.error?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['error'],
-        message: 'a trace step with ok:false must carry a non-empty error string (A1)'
+        message: 'a trace step with ok:false must carry a non-empty error string'
       });
     }
   });
@@ -185,7 +185,7 @@ export type AskStreamEvent = z.infer<typeof AskStreamEvent>;
 
 /**
  * Every `[n]` in an answer must have exactly one matching source. Extra or missing is a
- * grounding failure (PRD 7). Both the agent service and the bench use this.
+ * grounding failure. Both the agent service and the benchmark use this.
  */
 export function citationNumbers(text: string): number[] {
   const out = new Set<number>();

@@ -1,4 +1,4 @@
-import { COLLECTIONS, SEARCH_INDEXES, newId, type MemoryDoc } from '@lumina/contract';
+import { COLLECTIONS, SEARCH_INDEXES, newId, type MemoryDoc } from '@cited/contract';
 import { env } from './env.js';
 import { db } from './db.js';
 import { cosine, embed } from './embeddings.js';

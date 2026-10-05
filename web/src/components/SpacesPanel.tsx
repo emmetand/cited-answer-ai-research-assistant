@@ -7,7 +7,7 @@ type Doc = { docId: string; title: string; status: string; pct: number; pages?: 
 /**
  * Upload returns 202 immediately; the row then walks pending → parsing → embedding →
  * indexed on the worker. A document that goes straight to `indexed` in the response is a
- * synchronous parse, which fails the assignment even when it works.
+ * synchronous parse: the work is blocking the request, even if it succeeds.
  */
 export function SpacesPanel({
   spaces,

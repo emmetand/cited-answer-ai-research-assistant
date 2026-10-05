@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { AskMode, Depth } from '@lumina/contract';
+import type { AskMode, Depth } from '@cited/contract';
 
 export function Composer({
   onAsk,

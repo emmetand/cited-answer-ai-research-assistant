@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 /**
- * Dump the `runs` collection into runs/<requestId>.json. PROVIDED.
- *
- * MONGO-ONLY CONVENIENCE, not a gate. If your run logs live somewhere else, get them into
- * runs/<requestId>.json in the RunLog shape by whatever means suits: that shape is what
- * quality/check.mjs reads, and it is the only contractual part.
+ * Dump the `runs` collection into runs/<requestId>.json.
  *
  *   node scripts/export-runs.mjs                     # from MONGODB_URI in .env
  *   node scripts/export-runs.mjs --limit 200
  *
- * Your service writes a run log per answer locally; a deployed instance writes them to
- * Mongo instead. This is how you get a deployed run's trajectories onto disk so
- * `node quality/check.mjs .` can read them.
+ * Locally, the agent writes a run log per answer to disk. A deployed instance's disk does
+ * not outlive a deploy, so it also writes them to Mongo; this brings them back to disk for
+ * reading trajectories and auditing budgets.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -42,7 +38,7 @@ const client = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
 try {
   await client.connect();
   const runs = await client
-    .db(process.env.MONGODB_DB ?? 'lumina')
+    .db(process.env.MONGODB_DB ?? 'cited')
     .collection('runs')
     .find({}, { sort: { createdAt: -1 }, limit })
     .toArray();
@@ -54,7 +50,7 @@ try {
 
   for (const run of runs) {
     const id = run.requestId ?? String(run._id);
-    // Only the fields quality/check.mjs reads, so the file on disk is the declared shape.
+    // Only the RunLog fields, so the file on disk is the declared shape.
     const { tokens, wallClockSec, costUsd, terminated, toolCalls } = run;
     writeFileSync(
       join(outDir, `${id}.json`),

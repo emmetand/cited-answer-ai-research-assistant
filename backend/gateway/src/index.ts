@@ -1,18 +1,15 @@
 /**
- * LUMINA gateway — the software backend. PROVIDED SKELETON: YOU BUILD THIS OUT.
+ * Cited gateway — the edge. The browser talks ONLY to this service, and it never holds a
+ * provider key.
  *
- * What is already here: the server, CORS, the request id, the pino request log, /health
- * (which nests the agent service's health), a 501 for every contract route, and the
- * static hosting of web/dist. That is deliberately the boring half.
- *
- * What you build (backend/gateway/, see README Part 2):
- *   1. X-User-Id enforcement           → 401 without it, on every route but /health
- *   2. zod validation from @lumina/contract → 400 on a bad body, with the zod message
- *   3. a per-user rate limit           → 429
- *   4. the proxy to the agent service, and SSE pass-through for /threads/:id/ask
- *   5. 502 for any upstream failure    → never a 2xx when the agent threw
- *
- * The browser talks ONLY to this service. No provider key is ever read here.
+ *   - CORS, and an X-Request-Id on every request (reused if the caller sent one), forwarded
+ *     to the agent and logged by both, so one request is greppable end to end
+ *   - X-User-Id required on every API route → 401 without it
+ *   - request bodies validated against @cited/contract → 400 with the schema's message
+ *   - a per-user rate limit on the routes that cost money → 429
+ *   - everything else proxied to the agent service; answer streams passed through
+ *     unbuffered; any upstream failure → 502, never a 2xx
+ *   - in production, the built UI served from the same origin
  */
 import express from 'express';
 import cors from 'cors';
@@ -29,7 +26,7 @@ import {
   MAX_UPLOAD_BYTES,
   REQUEST_HEADER,
   USER_HEADER
-} from '@lumina/contract';
+} from '@cited/contract';
 import { env } from './env.js';
 import { forward } from './proxy.js';
 import { rateLimit } from './rateLimit.js';
@@ -93,23 +90,9 @@ app.get('/health', async (_req, res) => {
   res.status(ai.status === 'ok' ? 200 : 503).json(body);
 });
 
-// ---------------------------------------------------------------- the evaluation page's data
-
-// Public, like the page that renders it: a stranger opening /evals has no X-User-Id.
-app.get('/evals/report.json', (_req, res) => {
-  if (!existsSync(env.reportPath)) {
-    return res.status(404).json({
-      error: 'no evaluation report yet: run /fde-lumina-eval to produce reports/report.json',
-      status: 404,
-      requestId: String(res.locals.requestId)
-    });
-  }
-  res.sendFile(env.reportPath);
-});
-
 // ---------------------------------------------------------------- identity
 
-// Every API route but /health and the report needs X-User-Id. The static UI does not: a
+// Every API route but /health needs X-User-Id. The static UI does not: a
 // browser loading the page has not chosen an id yet.
 const API_ROUTE = /^\/(stats|threads|memory|spaces)(\/|$)/;
 app.use((req, res, next) => {
@@ -171,10 +154,10 @@ app.get('/spaces/:spaceId/documents', (req, res) => forward(req, res, SHORT));
 
 // ---------------------------------------------------------------- static UI
 
-// In production the gateway serves the built UI, so / and /evals come from one origin.
+// In production the gateway serves the built UI, so the page and the API share one origin.
 if (existsSync(env.webDist)) {
   app.use(express.static(env.webDist));
-  app.get(/^(?!\/(health|stats|threads|memory|spaces|artifacts|evals)).*/, (_req, res) => {
+  app.get(/^(?!\/(health|stats|threads|memory|spaces)).*/, (_req, res) => {
     res.sendFile(`${env.webDist}/index.html`);
   });
 }
@@ -183,7 +166,7 @@ app.use((req, res) => {
   res.status(404).json({ error: `no route ${req.method} ${req.path}`, status: 404 });
 });
 
-// A thrown error is a 502 with a log line, never a 200 with a plausible body (rule A1).
+// A thrown error is a 502 with a log line, never a 200 with a plausible body.
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   log.error({ err, requestId: res.locals.requestId }, 'gateway error');
   res.status(502).json({ error: err.message, status: 502, requestId: String(res.locals.requestId) });

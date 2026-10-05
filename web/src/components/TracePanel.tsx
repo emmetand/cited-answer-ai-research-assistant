@@ -1,7 +1,7 @@
-import type { TraceEvent } from '@lumina/contract';
+import type { TraceEvent } from '@cited/contract';
 
 /**
- * The trace is the debugging surface. A grader must be able to reconstruct why an answer
+ * The trace is the debugging surface. A reader must be able to reconstruct why an answer
  * cited what it cited from this alone, so a failed step shows its error string rather
  * than disappearing.
  */

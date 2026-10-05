@@ -1,8 +1,8 @@
 {
-  "name": "lumina",
+  "name": "cited",
   "private": true,
   "version": "0.1.0",
-  "description": "LUMINA \u2014 Perplexity-style AI search. FDE Agent Engineering Bootcamp, Assignment 1.",
+  "description": "Cited: a cited-answer AI research assistant. Streamed answers with clickable citations from live web search and your own documents.",
   "type": "module",
   "engines": {
     "node": ">=20.19"
@@ -14,19 +14,17 @@
     "web"
   ],
   "scripts": {
-    "dev": "npm run build -w @lumina/contract && concurrently -k -n agent,worker,gateway,web -c magenta,yellow,cyan,green \"npm:dev:agent\" \"npm:worker\" \"npm:dev:gateway\" \"npm:dev:web\"",
-    "dev:agent": "npm run dev -w @lumina/agent",
-    "dev:gateway": "npm run dev -w @lumina/gateway",
+    "dev": "npm run build -w @cited/contract && concurrently -k -n agent,worker,gateway,web -c magenta,yellow,cyan,green \"npm:dev:agent\" \"npm:worker\" \"npm:dev:gateway\" \"npm:dev:web\"",
+    "dev:agent": "npm run dev -w @cited/agent",
+    "dev:gateway": "npm run dev -w @cited/gateway",
     "dev:web": "node --env-file=.env node_modules/vite/bin/vite.js web",
-    "worker": "npm run worker -w @lumina/agent",
-    "build": "npm run build -w @lumina/contract && npm run build -w @lumina/agent && npm run build -w @lumina/gateway && npm run build -w @lumina/web",
+    "worker": "npm run worker -w @cited/agent",
+    "build": "npm run build -w @cited/contract && npm run build -w @cited/agent && npm run build -w @cited/gateway && npm run build -w @cited/web",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "indexes": "node scripts/create-indexes.mjs",
     "export:runs": "node scripts/export-runs.mjs",
-    "bench": "node benchmark/bench.mjs",
-    "quality": "node quality/check.mjs .",
-    "eval": "node eval/eval.mjs"
+    "bench": "node benchmark/bench.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",

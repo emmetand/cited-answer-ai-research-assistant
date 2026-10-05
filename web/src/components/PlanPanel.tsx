@@ -1,4 +1,4 @@
-import type { PlanEvent } from '@lumina/contract';
+import type { PlanEvent } from '@cited/contract';
 
 /**
  * A deep search says what it is going to look for before it looks. That is the whole

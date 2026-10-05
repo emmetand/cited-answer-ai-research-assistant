@@ -1,18 +1,18 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import pino from 'pino';
-import { COLLECTIONS, type Depth, type RunDoc, type RunLog } from '@lumina/contract';
+import { COLLECTIONS, type Depth, type RunDoc, type RunLog } from '@cited/contract';
 import { env } from './env.js';
 import { db } from './db.js';
 
 /**
- * One run log per answer, in the shape quality/check.mjs reads, written to two places:
- *   - runs/<requestId>.json on local disk, which the gates read directly;
+ * One run log per answer (the RunLog shape in the contract), written to two places:
+ *   - runs/<requestId>.json on local disk, for reading trajectories and auditing budgets;
  *   - the `runs` collection, because a deployed instance's disk does not outlive a deploy.
  *     `node scripts/export-runs.mjs` copies those back into runs/.
  *
  * A run the user abandoned (closed the tab) goes to runs/aborted/ only: it is not a failure
- * of the agent, and exported into runs/ it would fail rule A2 as though it were.
+ * of the agent, and mixed into runs/ it would read as one.
  */
 
 const log = pino({ level: env.logLevel });
@@ -27,7 +27,7 @@ export interface RunRecord {
   depth: Depth;
   run: Omit<RunLog, 'depth'>;
   aborted: boolean;
-  /** Kept on the Mongo copy only (not part of the file the gates read): what /stats aggregates. */
+  /** Kept on the Mongo copy only (not part of the file on disk): what /stats aggregates. */
   stats: { ttftMs: number | null; searchCached: boolean; webSearches: number };
 }
 

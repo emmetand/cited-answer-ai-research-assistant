@@ -1,9 +1,9 @@
-import type { Source } from '@lumina/contract';
+import type { Source } from '@cited/contract';
 
 /**
  * Renders the answer with every `[n]` as a chip. A chip whose number has no matching
  * source is drawn red: an ungrounded citation should be visible in the product, not only
- * in a grader's report.
+ * in a review.
  */
 export function AnswerText({
   text,

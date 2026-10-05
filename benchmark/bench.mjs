@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * LUMINA benchmark. PROVIDED — do not edit it, and do not loosen benchmark/sla.json to
- * pass. Zero dependencies: `node benchmark/bench.mjs` and nothing else installed.
+ * Cited benchmark. Targets live in benchmark/sla.json and are declared before a run: never
+ * loosen them to pass. Zero dependencies: `node benchmark/bench.mjs` and nothing else installed.
  *
  *   node benchmark/bench.mjs                    # the full run, through the gateway
- *   node benchmark/bench.mjs --smoke            # five queries (Gate 2)
+ *   node benchmark/bench.mjs --smoke            # five queries, a quick sanity run
  *   node benchmark/bench.mjs --json out.json    # machine-readable, anywhere you like
  *   node benchmark/bench.mjs --target https://your-gateway.fly.dev
  *
@@ -19,8 +19,8 @@
  *   decoupling     search p95 while a 60-page PDF ingests
  *   cost           per gear, from done.costUsd, against the declared price table
  *
- * Writes reports/bench.json (everything) and reports/eval.json (the four metric names
- * quality/check.mjs reads). Exits 1 on any missed target, 2 if the target is unusable.
+ * Writes reports/bench.json (everything) and reports/eval.json (the headline quality
+ * metrics). Exits 1 on any missed target, 2 if the target is unusable.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join, resolve, basename, extname } from 'node:path';
@@ -85,7 +85,7 @@ const M = {
   notes: [],
   stats: null,
   health: null,
-  /** Per-rubric-row evidence, so eval/build-report.mjs scores from measurements, not prose. */
+  /** Per-capability evidence, so every pass or fail is backed by a measurement, not prose. */
   caps: {}
 };
 
@@ -162,18 +162,6 @@ async function preflight() {
   await probe('POST /threads/thr_x/ask with an empty body', () =>
     client.raw('POST', '/threads/thr_x/ask', { body: {} }), 400);
 
-  // The grader's tooling pulls this with no header, so it must not be behind the user check.
-  {
-    let status = 0;
-    try {
-      status = (await client.raw('GET', '/evals/report.json', { headers: { 'x-user-id': '' } })).status;
-    } catch (err) {
-      status = err instanceof HttpError ? err.status : 0;
-    }
-    const ok = status !== 401;
-    M.contract.push({ check: 'GET /evals/report.json without X-User-Id', want: 'not 401', got: status, ok });
-    say(`  ${ok ? '✓' : '✗'} GET /evals/report.json without X-User-Id → ${status} (must not be 401)`);
-  }
 
   cap(
     'contractProbes',
@@ -209,7 +197,7 @@ async function fetchPageText(url) {
   try {
     const res = await fetch(url, {
       redirect: 'follow',
-      headers: { 'user-agent': 'lumina-bench/0.1 (+course benchmark)' },
+      headers: { 'user-agent': 'cited-bench/0.1 (+course benchmark)' },
       signal: AbortSignal.timeout(12000)
     });
     if (res.ok) text = stripHtml(await res.text());
@@ -309,7 +297,7 @@ async function runWebWorkload() {
 // ---------------------------------------------------------------- phase 2: RAG & recall@5
 
 function goldCorpusFiles() {
-  const dir = join(ROOT, 'eval', 'gold', 'corpus');
+  const dir = join(HERE, 'gold', 'corpus');
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((f) => ['.pdf', '.md', '.txt'].includes(extname(f).toLowerCase()))
@@ -340,7 +328,7 @@ async function uploadAndWait(spaceId, path, { timeoutMs = 240000 } = {}) {
 }
 
 async function runRag() {
-  const goldPath = join(ROOT, 'eval', 'gold', 'rag_gold.jsonl');
+  const goldPath = join(HERE, 'gold', 'rag_gold.jsonl');
   const files = goldCorpusFiles();
   if (!files.length || !existsSync(goldPath)) {
     M.notes.push('no gold corpus or gold set found — recall@5 skipped');
@@ -399,7 +387,7 @@ async function runRag() {
     const top5 = (a.sources ?? []).filter((s) => s.kind === 'doc').slice(0, 5);
     M.recall.asked++;
     const hit = top5.some((s) => {
-      // A learner's `title` may be the filename or the PDF's own title, so compare stems
+      // A document's `title` may be the filename or the PDF's own title, so compare stems
       // loosely rather than failing a correct retrieval on punctuation.
       const stem = (v) => String(v ?? '').toLowerCase().replace(/\.(pdf|md|txt)$/, '').replace(/[^a-z0-9]/g, '');
       const want = stem(item.doc);
@@ -663,7 +651,7 @@ function scoreDeep() {
     'quickNeverEscalates',
     escalated.length === 0,
     escalated.length
-      ? `${escalated.length} quick run(s) called plan_research — depth must be opted into, not drifted into (R2)`
+      ? `${escalated.length} quick run(s) called plan_research — depth must be opted into, not drifted into`
       : `${quickRuns.length} quick run(s), none called plan_research`
   );
 
@@ -726,7 +714,7 @@ async function probeDeepCap() {
 // ---------------------------------------------------------------- phase 4b: memory
 
 /**
- * The memory row is graded automatically, and it can be: every step here is arithmetic on
+ * Memory is checked automatically, and it can be: every step here is arithmetic on
  * a response body or a trace, never a judgement about whether an answer "sounds British".
  *
  *   1. ask thread A to remember a preference   → a row appears in GET /memory
@@ -979,7 +967,7 @@ if (!SMOKE) await runMemory();
 
 const metrics = computeMetrics();
 
-// The last few rubric rows are arithmetic on the metrics, so they are recorded here.
+// The last few capability checks are arithmetic on the metrics, so they are recorded here.
 cap(
   'sourcesBeforeTokens',
   metrics.orderingOk,
@@ -1058,7 +1046,7 @@ const report = {
 mkdirSync(join(ROOT, 'reports'), { recursive: true });
 writeFileSync(join(ROOT, 'reports', 'bench.json'), JSON.stringify(report, null, 2));
 
-// reports/eval.json holds exactly the metric names quality/check.mjs looks for (E2).
+// reports/eval.json: the headline quality metrics, small enough to diff between runs.
 writeFileSync(
   join(ROOT, 'reports', 'eval.json'),
   JSON.stringify(

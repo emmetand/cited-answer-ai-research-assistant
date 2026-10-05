@@ -1,9 +1,9 @@
 {
-  "name": "@lumina/contract",
+  "name": "@cited/contract",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The LUMINA API contract: zod schemas + TypeScript types for every route, SSE event, and MongoDB document. This is the source of truth. Do not edit it.",
+  "description": "The Cited API contract: zod schemas and TypeScript types for every route, SSE event and MongoDB document, shared by the gateway, the agent service and the UI.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

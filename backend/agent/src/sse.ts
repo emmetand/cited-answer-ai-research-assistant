@@ -7,7 +7,7 @@ import {
   TokenEvent,
   TraceEvent,
   type SseEventName
-} from '@lumina/contract';
+} from '@cited/contract';
 
 const schemas = {
   plan: PlanEvent,

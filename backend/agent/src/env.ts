@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { resolve } from 'node:path';
 
-// The single .env at the assignment root. Provider keys are read HERE and nowhere else.
+// The single .env at the repository root. Provider keys are read HERE and nowhere else.
 config({ path: resolve(process.cwd(), '../../.env') });
 config({ path: resolve(process.cwd(), '.env') });
 
@@ -12,7 +12,7 @@ const num = (v: string | undefined, fallback: number) => {
 export const env = {
   port: num(process.env.PORT_AGENT ?? process.env.PORT, 8000),
   mongoUri: process.env.MONGODB_URI ?? '',
-  mongoDb: process.env.MONGODB_DB ?? 'lumina',
+  mongoDb: process.env.MONGODB_DB ?? 'cited',
   vectorBackend: (process.env.VECTOR_BACKEND ?? 'atlas-vector-search') as
     | 'atlas-vector-search'
     | 'mongo-cosine-scan',
@@ -47,15 +47,15 @@ export const env = {
   deepSubQuestionsMax: num(process.env.DEEP_SUB_QUESTIONS_MAX, 6),
   deepDailyCap: num(process.env.DEEP_DAILY_CAP, 5),
 
-  // The hard caps from AGENTS.md. Raising these to make a gate pass is the failure mode
-  // the caps exist to catch. Two gears, two envelopes.
+  // Hard caps per run, per gear. Raising them to make a slow run "pass" is exactly the
+  // failure they exist to catch. Two gears, two envelopes.
   maxToolCalls: num(process.env.MAX_TOOL_CALLS, 8),
   maxWallClockSec: num(process.env.MAX_WALL_CLOCK_SEC, 90),
   maxToolCallsDeep: num(process.env.MAX_TOOL_CALLS_DEEP, 24),
   maxWallClockSecDeep: num(process.env.MAX_WALL_CLOCK_SEC_DEEP, 240),
 
   logLevel: process.env.LOG_LEVEL ?? 'info',
-  /** Where the per-answer run logs land. quality/check.mjs reads this folder. */
+  /** Where the per-answer run logs land. */
   runsDir: resolve(process.cwd(), '../../runs')
 } as const;
 

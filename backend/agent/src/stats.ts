@@ -1,4 +1,4 @@
-import { COLLECTIONS, type StatsResponse } from '@lumina/contract';
+import { COLLECTIONS, type StatsResponse } from '@cited/contract';
 import { env } from './env.js';
 import { db } from './db.js';
 import { deepUsedToday } from './deepCap.js';

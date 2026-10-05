@@ -1,40 +1,21 @@
 /**
- * LUMINA agent service — the AI backend. PROVIDED SKELETON: YOU BUILD THIS OUT.
- * This is where the real work is. Provider keys live only in this process.
+ * Cited agent service — where the work happens. Provider keys live only in this process,
+ * and only the gateway may reach it.
  *
- * What is already here: the server, /health (Mongo ping + which model, provider and
- * vector backend are live), and a 501 for every other route.
+ *   POST /threads/:id/ask   the answer stream: trace → sources → token → done
+ *                           (deep: plan first), quick or deep gear (loop.ts, deep.ts)
+ *   /threads, /memory       conversation history and long-term memory
+ *   /spaces/...             document upload (202 + jobs queue) and status
+ *   GET /stats, /health     service-wide numbers, and what is live
  *
- * What you build (README Part 1, in this order — each step is testable with curl -N):
- *   1. the QUICK loop: plan → choose tool → observe → repeat → answer, with web_search
- *      and fetch_page, streaming trace → sources → token → done. sources BEFORE the
- *      first token. Disable compression on this route and flush after every event.
- *   2. the search cache: in-process LRU over the searchCache collection (TTL index),
- *      key = sha256(normalized query + provider). searchCached only when every hit.
- *   3. threads + messages, so a follow-up sees the thread.
- *   4. memory: save_memory / recall_memory over the memories vector index; GET /memory,
- *      DELETE /memory/:id.
- *   5. the run log: one runs/<requestId>.json per answer, in the RunLog shape from the
- *      contract. Ten lines. The gates read it, so it is not optional.
- *   6. spaces + the jobs worker: upload → GridFS → parse → chunk → embed → upsert →
- *      read-your-write probe → indexed.
- *   7. hybrid retrieval: $vectorSearch + $search fused with RRF, page locators.
- *   8. DEEP search (depth: "deep"): plan_research decomposes the question into 3–6
- *      sub-questions, you stream a `plan` event BEFORE retrieving anything, research each
- *      sub-question, then merge the results into ONE citation numbering and synthesise.
- *      Every trace step and every source carries the subQuestion it served. Deep runs
- *      under the wider caps (maxToolCallsDeep, maxWallClockSecDeep) and behind
- *      DEEP_DAILY_CAP → 429 {error, resetsAt}.
- *
- * Three rules to hold on to while you write it:
+ * Three rules every route keeps:
  *   - Fail loud. A provider exception ends the run with terminated:"error" and a 502.
- *     Never a try/catch that returns a plausible answer. (Live Translate served English
- *     for weeks because of exactly that catch.)
- *   - Grounded or nothing. A citation that does not resolve to something retrieved in
- *     THIS request is an automatic fail.
- *   - Depth is opted into, never drifted into. A quick search may not call plan_research,
- *     however much the model would like to. Deep costs several times more, and a product
- *     that escalates itself is a product with an unbounded bill.
+ *     Never a try/catch that returns a plausible answer: a swallowed exception turns a
+ *     broken dependency into confident, wrong output that nothing alerts on.
+ *   - Grounded or nothing. Every [n] resolves to something retrieved in THIS request.
+ *   - Depth is opted into, never drifted into. A quick search cannot call plan_research,
+ *     however much the model would like to. A product that escalates its own spend is a
+ *     product with an unbounded bill.
  */
 import express from 'express';
 import multer from 'multer';
@@ -49,12 +30,11 @@ import {
   HealthResponse,
   MAX_UPLOAD_BYTES,
   REQUEST_HEADER,
-  ROUTES,
   USER_HEADER,
   newId,
   type MessageDoc,
   type ThreadDoc
-} from '@lumina/contract';
+} from '@cited/contract';
 import { env } from './env.js';
 import { db, pingDb } from './db.js';
 import { SseStream } from './sse.js';
@@ -110,7 +90,7 @@ app.use((req, res, next) => {
   const requestId = (req.header(REQUEST_HEADER) ?? `req_${randomUUID().slice(0, 12)}`).trim();
   res.locals.requestId = requestId;
   res.setHeader(REQUEST_HEADER, requestId);
-  if (req.path === '/health' || req.path === '/evals/report.json') return next();
+  if (req.path === '/health') return next();
   const userId = req.header(USER_HEADER)?.trim();
   if (!userId) return res.status(401).json({ error: 'X-User-Id header is required', status: 401, requestId });
   res.locals.userId = userId;
@@ -401,18 +381,6 @@ app.post('/threads/:threadId/ask', async (req, res, next) => {
     next(err);
   }
 });
-
-// ---------------------------------------------------------------- everything else: 501
-
-const notImplemented = (route: string) => (_req: express.Request, res: express.Response) => {
-  res.status(501).json({ error: `not implemented yet: ${route}. Build it in backend/agent/src/.`, status: 501 });
-};
-
-for (const route of ROUTES) {
-  if (route.path === '/health' || route.path === '/evals/report.json') continue;
-  const method = route.method.toLowerCase() as 'get' | 'post' | 'delete';
-  app[method](route.path, notImplemented(`${route.method} ${route.path}`));
-}
 
 app.use((req, res) => res.status(404).json({ error: `no route ${req.method} ${req.path}`, status: 404 }));
 

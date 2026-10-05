@@ -1,4 +1,4 @@
-import { SEARCH_INDEXES, type ChunkDoc, type DocumentDoc, type Locator } from '@lumina/contract';
+import { SEARCH_INDEXES, type ChunkDoc, type DocumentDoc, type Locator } from '@cited/contract';
 import { env } from './env.js';
 import { chunks, documents } from './documents.js';
 import { cosine, embed } from './embeddings.js';
@@ -14,7 +14,7 @@ import { cosine, embed } from './embeddings.js';
  *
  * No re-ranker, on purpose for now: RRF over two retrievers is the cheap baseline, a
  * cross-encoder or LLM re-rank adds latency to every document answer, and the gold set's
- * recall@5 is the number that decides whether it has to earn its place (Module 3).
+ * recall@5 is the number that decides whether it has to earn its place.
  */
 
 export interface DocHit {

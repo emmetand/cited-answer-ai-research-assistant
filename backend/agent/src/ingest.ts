@@ -1,6 +1,6 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 import type { AnyBulkWriteOperation } from 'mongodb';
-import { SEARCH_INDEXES, type ChunkDoc, type DocumentDoc } from '@lumina/contract';
+import { SEARCH_INDEXES, type ChunkDoc, type DocumentDoc } from '@cited/contract';
 import { env } from './env.js';
 import { chunks, documents, readUpload } from './documents.js';
 import { parseUpload } from './parse.js';
@@ -26,7 +26,7 @@ export async function indexDocument(docId: string, log: Log): Promise<void> {
   await setStatus({ status: 'parsing', pct: 5 });
   const bytes = await readUpload(doc.fileId);
   const parsed = await parseUpload(bytes, doc.mimeType, doc.title);
-  if (parsed.chunks.length === 0) throw new Error('no extractable text (a scanned PDF needs OCR, which LUMINA does not do)');
+  if (parsed.chunks.length === 0) throw new Error('no extractable text (a scanned PDF needs OCR, which this service does not do)');
   log('parsed', { docId, pages: parsed.pages, chunks: parsed.chunks.length });
   await setStatus({ status: 'embedding', pct: 15, ...(parsed.pages ? { pages: parsed.pages } : {}) });
 

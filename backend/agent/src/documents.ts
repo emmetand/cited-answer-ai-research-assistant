@@ -10,7 +10,7 @@ import {
   type DocumentDoc,
   type JobDoc,
   type SpaceDoc
-} from '@lumina/contract';
+} from '@cited/contract';
 import { db } from './db.js';
 
 /** Spaces, documents, raw uploads (GridFS) and the jobs queue: everything on disk for RAG. */

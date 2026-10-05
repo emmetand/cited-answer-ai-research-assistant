@@ -1,9 +1,9 @@
 {
-  "name": "@lumina/web",
+  "name": "@cited/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "LUMINA web UI. PROVIDED \u2014 this is the acceptance test. Do not edit it; make it light up.",
+  "description": "Cited web UI: streaming answers, citation chips, sources rail, plan and trace panels, memory and Spaces.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@lumina/contract": "*",
+    "@cited/contract": "*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

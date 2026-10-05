@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { USER_HEADER } from '@lumina/contract';
+import { USER_HEADER } from '@cited/contract';
 import { env } from './env.js';
 
 /**
@@ -8,7 +8,7 @@ import { env } from './env.js';
  * second is not abuse.
  *
  * A sliding window in this process's memory: simple and fast, but per gateway instance and
- * lost on restart. Two gateway instances would each allow the full rate. (DESIGN.md, trade-offs.)
+ * lost on restart. Two gateway instances would each allow the full rate. (See ARCHITECTURE.md, trade-offs.)
  */
 
 const WINDOW_MS = 60_000;

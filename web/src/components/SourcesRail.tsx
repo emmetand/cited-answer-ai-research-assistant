@@ -1,4 +1,4 @@
-import type { Source } from '@lumina/contract';
+import type { Source } from '@cited/contract';
 
 const docLabel = (s: Source) => {
   const p = s.locator?.page;

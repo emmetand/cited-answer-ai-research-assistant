@@ -7,7 +7,7 @@ import {
   type Source,
   type StreamErrorEvent,
   type TraceEvent
-} from '@lumina/contract';
+} from '@cited/contract';
 
 /**
  * The gateway. The browser never talks to the agent service, and never holds a key.
@@ -17,9 +17,9 @@ import {
 const viteEnv = (import.meta as { env?: Record<string, string | undefined> }).env;
 export const API = (viteEnv?.VITE_API_URL ?? '').replace(/\/$/, '');
 
-const USER_KEY = 'lumina.userId';
+const USER_KEY = 'cited.userId';
 
-/** X-User-Id is the whole auth story for this assignment: one header, required everywhere. */
+/** X-User-Id identifies the user: one header, required on every API route. (A demo identity, not authentication.) */
 export function userId(): string {
   let id = localStorage.getItem(USER_KEY);
   if (!id) {
@@ -109,9 +109,7 @@ export const api = {
       method: 'POST',
       body: form
     });
-  },
-
-  evalsReport: () => request<unknown>('/evals/report.json')
+  }
 };
 
 // ---------------------------------------------------------------- the ask stream

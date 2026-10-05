@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Check the gold set against the corpus manifest. PROVIDED.
+ * Check the gold set against the corpus manifest.
  *
- *   node eval/gold/validate-gold.mjs
+ *   node benchmark/gold/validate-gold.mjs
  *
  * For every item it asserts: the document exists in the corpus, the `anchor` text really
  * appears in that document, and — for a PDF item — appears on the `page` the item claims.
- * A gold set nobody validated is a gold set that fails a learner for being right.
+ * A gold set nobody validated is a gold set that fails a system for being right.
  *
  * Run it after editing a source: the paginator is fixed, but adding a paragraph on page 2
  * pushes facts onto page 3, and this is what tells you which items moved.

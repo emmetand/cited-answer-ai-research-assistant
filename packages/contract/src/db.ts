@@ -4,7 +4,7 @@ import { DocStatus } from './http.js';
 import { Depth, DoneEvent, Locator, Source, SubQuestion, Terminated, ToolName } from './sse.js';
 
 /**
- * One database, `lumina` (PRD 8). These are the documents, not an ODM. Mongoose is
+ * One MongoDB database (`cited` by default). These are the documents, not an ODM. Mongoose is
  * allowed but not required: zod is the contract, the ODM is an implementation detail.
  * Every document carries `userId` (from X-User-Id) and `createdAt`.
  */
@@ -136,9 +136,9 @@ export const RequestDoc = z.object({
 export type RequestDoc = z.infer<typeof RequestDoc>;
 
 /**
- * The run log. Exactly the shape `quality/check.mjs` reads out of `runs/<requestId>.json`
- * (PRD 13) — `tokens` is a single total, not the `{in,out}` split the done event carries.
- * Written once per answer. Ten lines of adapter; it is what the gates read.
+ * The run log: one `runs/<requestId>.json` per answer, the record of what the agent did
+ * and what it cost. `tokens` is a single total, not the `{in,out}` split the done event
+ * carries. Written once per answer.
  */
 export const RunLog = z.object({
   tokens: z.number().int().nonnegative(),
@@ -146,9 +146,9 @@ export const RunLog = z.object({
   costUsd: z.number().nonnegative(),
   terminated: Terminated,
   /**
-   * Which gear ran. The gates read one global budget out of expectations.json, so this is
-   * how a reader (and the bench) tells a legitimately expensive deep run apart from a
-   * quick run that has quietly run away with the budget.
+   * Which gear ran. A deep run may legitimately cost several times a quick one, so this is
+   * how a reader (and the benchmark) tells an expensive deep run apart from a quick run
+   * that has quietly run away with its budget.
    */
   depth: Depth.optional(),
   toolCalls: z.array(
@@ -164,7 +164,7 @@ export const RunLog = z.object({
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['error'],
-            message: 'a failed tool call must carry a non-empty error string (A1)'
+            message: 'a failed tool call must carry a non-empty error string'
           });
         }
       })

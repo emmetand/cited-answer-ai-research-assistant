@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { newId, PlanEvent, unresolvedCitations, type AskTool, type Source, type SubQuestion, type Terminated } from '@lumina/contract';
+import { newId, PlanEvent, unresolvedCitations, type AskTool, type Source, type SubQuestion, type Terminated } from '@cited/contract';
 import { env } from './env.js';
 import { anthropic, DETERMINISTIC, llmCostUsd, MODEL, SEARCH_USD_PER_CALL } from './llm.js';
 import { EMBED_USD_PER_MTOK } from './embeddings.js';

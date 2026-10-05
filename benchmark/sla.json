@@ -1,5 +1,5 @@
 {
-  "_comment": "Targets your LUMINA deployment must meet, declared BEFORE the first run, plus the cost model bench.mjs uses. Two gears, two envelopes: quick is the default and must stay cheap and fast; deep may cost and take several times more, and has to earn it. Tune the workload to your corpus; do not loosen the gates to pass. PRICES ARE PLACEHOLDERS: set them to your providers' published rates before trusting the dollar figures.",
+  "_comment": "Targets the deployment must meet, declared BEFORE the first run, plus the cost model bench.mjs uses. Two gears, two envelopes: quick is the default and must stay cheap and fast; deep may cost and take several times more, and has to earn it. Tune the workload to your corpus; do not loosen the gates to pass. PRICES ARE PLACEHOLDERS: set them to your providers' published rates before trusting the dollar figures.",
   "target": "http://localhost:8787",
   "user_id": "bench",
 

@@ -1,8 +1,8 @@
 import OpenAI from 'openai';
-import { EMBEDDING_DIMS } from '@lumina/contract';
+import { EMBEDDING_DIMS } from '@cited/contract';
 import { env, secrets } from './env.js';
 
-/** Embeddings come from OpenAI even though answers come from Claude: the assignment names text-embedding-3-small. */
+/** Embeddings come from OpenAI (text-embedding-3-small, 1 536 dims) even though answers come from Claude. */
 const openai = new OpenAI({ apiKey: secrets.openai, maxRetries: 2, timeout: 15_000 });
 
 /** USD per million embedding tokens, matching `embedding_usd_per_mtok` in benchmark/sla.json. */

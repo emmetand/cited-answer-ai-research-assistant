@@ -14,7 +14,7 @@
 import { hostname } from 'node:os';
 import { setTimeout as sleep } from 'node:timers/promises';
 import pino from 'pino';
-import type { DocumentDoc } from '@lumina/contract';
+import type { DocumentDoc } from '@cited/contract';
 import { env } from './env.js';
 import { documents, jobs } from './documents.js';
 import { indexDocument } from './ingest.js';

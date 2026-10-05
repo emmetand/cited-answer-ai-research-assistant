@@ -21,7 +21,7 @@ export async function fetchPage(rawUrl: string, signal: AbortSignal): Promise<Fe
   const res = await fetch(url, {
     redirect: 'follow',
     headers: {
-      'user-agent': 'Mozilla/5.0 (compatible; LuminaBot/0.1; +course project)',
+      'user-agent': 'Mozilla/5.0 (compatible; CitedBot/0.1; +course project)',
       accept: 'text/html,application/xhtml+xml,text/plain;q=0.9'
     },
     signal: AbortSignal.any([signal, AbortSignal.timeout(TIMEOUT_MS)])

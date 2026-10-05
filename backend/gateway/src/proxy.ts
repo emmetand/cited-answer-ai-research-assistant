@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import pino from 'pino';
-import { REQUEST_HEADER, USER_HEADER } from '@lumina/contract';
+import { REQUEST_HEADER, USER_HEADER } from '@cited/contract';
 import { env } from './env.js';
 
 const log = pino({ level: env.logLevel });
@@ -22,7 +22,7 @@ export interface ForwardOptions {
  *     server compresses, and each chunk is written the moment it arrives.
  *   - The browser leaving cancels the upstream request, which the agent sees as its
  *     client going away and stops spending on.
- *   - The agent being unreachable is a 502, never a 2xx with an empty body (rule A1).
+ *   - The agent being unreachable is a 502, never a 2xx with an empty body.
  */
 export async function forward(req: Request, res: Response, opts: ForwardOptions = {}): Promise<void> {
   const requestId = String(res.locals.requestId);

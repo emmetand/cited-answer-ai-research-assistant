@@ -1,9 +1,9 @@
 {
-  "name": "@lumina/agent",
+  "name": "@cited/agent",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "LUMINA AI backend: the agent loop, its tools, memory, RAG, the jobs worker, artifacts. YOU BUILD THIS. Provider keys live only here.",
+  "description": "Cited agent service: the agent loop and its tools, quick and deep search, memory, document RAG and the jobs worker. Provider keys live only here.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
-    "@lumina/contract": "*",
+    "@cited/contract": "*",
     "@mozilla/readability": "^0.5.0",
     "dotenv": "^16.4.5",
     "express": "^4.22.2",
@@ -33,6 +33,5 @@
     "@types/node": "^20.16.5",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2"
-  },
-  "_note": "Your LLM SDK is your choice and is NOT pinned here: add @anthropic-ai/sdk, or use openai, or call the HTTP API directly. Whatever you pick, /health must name the model. openai is present because embeddings (text-embedding-3-small) are named by the assignment."
+  }
 }

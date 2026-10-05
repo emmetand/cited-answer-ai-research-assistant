@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 /**
- * Create every index LUMINA needs, from scripts/indexes.json. PROVIDED — safe to re-run.
- *
- * MONGO-ONLY CONVENIENCE, not a gate. It is a helper for the taught MERN path; nothing in
- * the grader calls it. If you built on another store, create its indexes however that store
- * expects and make /health name it.
+ * Create every index the service needs, from scripts/indexes.json. Safe to re-run.
  *
  *   node scripts/create-indexes.mjs            # apply
  *   node scripts/create-indexes.mjs --status   # just show what exists
  *
  * A plain mongod (docker compose up mongo) has no Atlas Search: the three search indexes
  * will fail and this script says so and keeps going, because the regular and TTL indexes
- * still apply. Run with VECTOR_BACKEND=mongo-cosine-scan in that case, and make /health
- * say which backend is live so a grader knows what they are looking at.
+ * still apply. Run with VECTOR_BACKEND=mongo-cosine-scan in that case; /health reports
+ * which backend is live.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -25,7 +21,7 @@ config({ path: resolve(HERE, '..', '.env') });
 
 const spec = JSON.parse(readFileSync(join(HERE, 'indexes.json'), 'utf8'));
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB ?? 'lumina';
+const dbName = process.env.MONGODB_DB ?? 'cited';
 const statusOnly = process.argv.includes('--status');
 
 if (!uri) {
@@ -39,7 +35,7 @@ let warnings = 0;
 try {
   await client.connect();
   const db = client.db(dbName);
-  console.log(`lumina indexes → ${dbName}\n`);
+  console.log(`cited indexes → ${dbName}\n`);
 
   if (statusOnly) {
     for (const name of Object.keys(spec.collections)) {

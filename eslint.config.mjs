@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import ts from 'typescript-eslint';
 
 export default [
-  { ignores: ['**/dist/**', '**/node_modules/**', 'runs/**', 'reports/**', 'eval/gold/corpus/**'] },
+  { ignores: ['**/dist/**', '**/node_modules/**', 'runs/**', 'reports/**', 'benchmark/gold/corpus/**'] },
   js.configs.recommended,
   ...ts.configs.recommended,
   {
@@ -13,7 +13,7 @@ export default [
     }
   },
   {
-    files: ['**/*.mjs', 'scripts/**/*.mjs', 'benchmark/**/*.mjs', 'eval/**/*.mjs', 'quality/**/*.mjs'],
+    files: ['**/*.mjs', 'scripts/**/*.mjs', 'benchmark/**/*.mjs'],
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: {
         process: 'readonly',
         console: 'readonly',

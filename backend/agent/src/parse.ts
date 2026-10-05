@@ -1,4 +1,4 @@
-import type { Locator } from '@lumina/contract';
+import type { Locator } from '@cited/contract';
 import { env } from './env.js';
 
 /**

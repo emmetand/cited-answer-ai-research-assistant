@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { resolve } from 'node:path';
 
-// Both services read the single .env at the assignment root.
+// Both services read the single .env at the repository root.
 config({ path: resolve(process.cwd(), '../../.env') });
 config({ path: resolve(process.cwd(), '.env') });
 
@@ -19,8 +19,6 @@ export const env = {
     .filter(Boolean),
   rateLimitPerMinute: num(process.env.RATE_LIMIT_PER_MINUTE, 30),
   logLevel: process.env.LOG_LEVEL ?? 'info',
-  /** Serve the built UI from the gateway in production so one host serves / and /evals. */
-  webDist: resolve(process.cwd(), '../../web/dist'),
-  /** The Product Evaluation the eval skill writes; served at GET /evals/report.json. */
-  reportPath: resolve(process.cwd(), process.env.REPORT_PATH ?? '../../reports/report.json')
+  /** Serve the built UI from the gateway in production, so one host serves the page and the API. */
+  webDist: resolve(process.cwd(), '../../web/dist')
 } as const;

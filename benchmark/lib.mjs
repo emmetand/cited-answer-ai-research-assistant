@@ -187,7 +187,7 @@ export async function ask(client, threadId, body, { timeoutMs = 300000 } = {}) {
  * Normalize before comparing, then require a run of consecutive tokens rather than exact
  * snippet equality: quotes, whitespace and ellipses differ between what a page serves and
  * what a model quotes, and failing an honest citation on a curly apostrophe teaches nobody
- * anything. 12 tokens is the declared window (PRD 16).
+ * anything. 12 tokens is the declared window.
  */
 export const normalize = (s) =>
   String(s ?? '')
@@ -215,7 +215,7 @@ export const citationNumbers = (text) => {
 
 // ---------------------------------------------------------------- cost
 
-/** Cost from the declared price table, so a learner's numbers are reproducible. */
+/** Cost from the declared price table, so the numbers are reproducible. */
 export function costOf({ tokensIn = 0, tokensOut = 0, searches = 0, embedTokens = 0, images = 0 }, prices) {
   return (
     (tokensIn / 1e6) * (prices.input_usd_per_mtok ?? 0) +
@@ -255,7 +255,7 @@ export async function pool(tasks, limit) {
  * A valid multi-page PDF, generated at runtime, so the ingest-decoupling check has a real
  * upload with an exact page count and the repo carries no binary fixture.
  */
-export function makePdf(pages, title = 'LUMINA bench corpus') {
+export function makePdf(pages, title = 'Cited bench corpus') {
   const objects = [];
   const add = (body) => objects.push(body) && objects.length;
 

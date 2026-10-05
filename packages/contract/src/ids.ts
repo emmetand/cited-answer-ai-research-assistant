@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Ids are prefixed strings generated in the app, not ObjectIds, so a thread or an
- * answer is readable in a log line and in a URL (PRD 8).
+ * answer is readable in a log line and in a URL.
  */
 const prefixed = (prefix: string, label: string) =>
   z
@@ -24,7 +24,7 @@ export type SpaceId = z.infer<typeof SpaceId>;
 export type DocId = z.infer<typeof DocId>;
 export type ArtifactId = z.infer<typeof ArtifactId>;
 
-/** Short, url-safe, collision-resistant enough for one cohort. `newId('thr')` → `thr_k3f9a2b1c7`. */
+/** Short, url-safe, collision-resistant enough for a single deployment. `newId('thr')` → `thr_k3f9a2b1c7`. */
 export function newId(prefix: 'thr' | 'ans' | 'spc' | 'doc' | 'art' | 'req' | 'mem'): string {
   const rand = Math.random().toString(36).slice(2, 8);
   return `${prefix}_${Date.now().toString(36)}${rand}`;

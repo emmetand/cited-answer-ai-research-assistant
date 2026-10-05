@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Render the authored sources into the corpus a learner uploads. PROVIDED.
+ * Render the authored sources into the test corpus the benchmark uploads.
  *
- *   node eval/gold/build-corpus.mjs
+ *   node benchmark/gold/build-corpus.mjs
  *
- * sources/*.md  →  corpus/*.pdf   (two of them, so page locators can be graded)
- *               →  corpus/*.md    (two of them, so heading locators can be graded)
+ * sources/*.md  →  corpus/*.pdf   (two of them, so page locators can be checked)
+ *               →  corpus/*.md    (two of them, so heading locators can be checked)
  *               →  pages.json     (which heading landed on which page)
  *
  * The paginator is fixed — 44 lines a page, wrapped at 92 characters — so `p. 3` is `p. 3`
@@ -230,5 +230,5 @@ for (const name of AS_MD) {
 }
 
 writeFileSync(join(HERE, 'pages.json'), JSON.stringify(manifest, null, 2));
-console.log(`\ncorpus: ${readdirSync(OUT).length} file(s) in eval/gold/corpus`);
-console.log('manifest: eval/gold/pages.json — check it after editing a source, pages move');
+console.log(`\ncorpus: ${readdirSync(OUT).length} file(s) in benchmark/gold/corpus`);
+console.log('manifest: benchmark/gold/pages.json — check it after editing a source, pages move');

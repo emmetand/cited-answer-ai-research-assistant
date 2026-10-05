@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import pino from 'pino';
-import { COLLECTIONS, type SearchCacheDoc } from '@lumina/contract';
+import { COLLECTIONS, type SearchCacheDoc } from '@cited/contract';
 import { env } from './env.js';
 import { db } from './db.js';
 import type { SearchResult } from './search.js';

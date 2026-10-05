@@ -4,9 +4,9 @@
 services:
   mongo:
     image: mongo:7
-    container_name: lumina-mongo
+    container_name: cited-mongo
     ports: ['27017:27017']
-    volumes: ['lumina-mongo:/data/db']
+    volumes: ['cited-mongo:/data/db']
     command: ['--quiet']
 volumes:
-  lumina-mongo:
+  cited-mongo:
